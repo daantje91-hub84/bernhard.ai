@@ -26,7 +26,7 @@ try {
 // --- NEUER TEIL ENDE ---
 
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 app.post('/api/bernard', async (req, res) => {
