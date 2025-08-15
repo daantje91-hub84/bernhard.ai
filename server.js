@@ -67,7 +67,9 @@ app.post('/api/bernard', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Bernard.ai (mit Gemini) läuft auf http://localhost:${port}`);
-  console.log("System-Prompt erfolgreich aus 'prompt.txt' geladen.");
-});
+// app.listen(port, () => {
+//   console.log(`Bernard.ai (mit Gemini) läuft auf http://localhost:${port}`);
+//   console.log("System-Prompt erfolgreich aus 'prompt.txt' geladen.");
+// });
+
+module.exports = app; 
