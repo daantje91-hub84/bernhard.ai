@@ -1,0 +1,17 @@
+{
+  "name": "bernard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js" // <-- DIESE ZEILE IST WICHTIG
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "...",
+    "dotenv": "...",
+    "express": "..."
+  }
+}

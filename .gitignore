@@ -1,0 +1,4 @@
+# Verhindert, dass sensible Daten und unnötige Dateien hochgeladen werden
+.env
+node_modules
+.DS_Store

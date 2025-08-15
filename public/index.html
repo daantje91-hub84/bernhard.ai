@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bernhard.ai</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    /* Das gesamte CSS von vorhin bleibt exakt gleich... */
+    * { box-sizing: border-box; }
+    html { font-family: 'EB Garamond', serif; }
+    body {
+      margin: 0;
+      background: #f7f0d6;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #logo-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #1a1a1a;
+      font-size: 2.4rem;
+      font-weight: 700;
+      user-select: none;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .logo .material-icons {
+      font-size: 2.8rem;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #logo-container.active {
+      top: 1.5rem;
+      transform: translate(-50%, 0);
+    }
+    #logo-container.active .logo { font-size: 1.5rem; }
+    #logo-container.active .logo .material-icons { font-size: 1.8rem; }
+    main#chat-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      padding-top: 6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+    main#chat-container.active { opacity: 1; }
+    .chat-message {
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      max-width: 80%;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+    .chat-message.user {
+      background-color: #e1cdaA;
+      color: #3a1a1a;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-message.ai {
+      background-color: #fff9e6;
+      border: 1.5px solid #a14b4b;
+      color: #3a1a1a;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .chat-message.loading span {
+      display: inline-block;
+      animation: pulse 1.4s infinite;
+    }
+    .chat-message.loading span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-message.loading span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+    footer {
+      background: #f0e6c8;
+      border-top: 1.5px solid #a14b4b;
+      padding: 0.75rem 1rem;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    footer.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    form#chat-form {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      font-family: 'EB Garamond', serif;
+      font-size: 1.2rem;
+      padding: 0.6rem 0.8rem;
+      border: 1.8px solid #a14b4b;
+      border-radius: 20px;
+      outline-offset: 2px;
+      background: #fff9e6;
+      color: #3a1a1a;
+    }
+    button#submit-btn {
+      background-color: #a14b4b;
+      color: #f7f0d6;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease;
+    }
+    button#submit-btn:hover { background-color: #8b3a3a; }
+    button#submit-btn:disabled { background-color: #b09a9a; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div id="logo-container">
+    <div class="logo" aria-label="Bernhard.ai Logo">
+      <span class="material-icons" aria-hidden="true">history_edu</span>
+      Bernhard.ai
+    </div>
+  </div>
+
+  <main id="chat-container"></main>
+
+  <footer id="footer">
+    <form id="chat-form" autocomplete="off">
+      <input type="text" id="topic-input" name="topic" placeholder="Stellen Sie eine belanglose Frage..." required />
+      <button type="submit" id="submit-btn" aria-label="Senden">
+        <span class="material-icons">send</span>
+      </button>
+    </form>
+  </footer>
+
+<script>
+  // --- DOM-Elemente ---
+  const logoContainer = document.getElementById('logo-container');
+  const chatContainer = document.getElementById('chat-container');
+  const chatForm = document.getElementById('chat-form');
+  const topicInput = document.getElementById('topic-input');
+  const submitBtn = document.getElementById('submit-btn');
+  const footer = document.getElementById('footer');
+  let chatHasStarted = false;
+
+  function startChatUI() {
+    if (!chatHasStarted) {
+      logoContainer.classList.add('active');
+      chatContainer.classList.add('active');
+      footer.classList.add('active');
+      chatHasStarted = true;
+      setTimeout(() => {
+        addMessage('ai', 'Was wollen Sie schon wieder? Formulieren Sie gefälligst eine Frage, wenn Sie meine Zeit schon mit Ihrer Anwesenheit vergeuden.');
+        topicInput.focus();
+      }, 800);
+    }
+  }
+
+  function typewriter(element, text) {
+    let i = 0;
+    element.textContent = '';
+    submitBtn.disabled = true;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      } else {
+        clearInterval(interval);
+        submitBtn.disabled = false;
+        topicInput.focus();
+      }
+    }, 25);
+  }
+
+  function addMessage(sender, text) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message', sender);
+    if (sender === 'ai') {
+      typewriter(messageElement, text);
+    } else {
+      messageElement.textContent = text;
+    }
+    chatContainer.appendChild(messageElement);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return messageElement;
+  }
+  
+  function showLoadingIndicator() {
+    const loadingElement = document.createElement('div');
+    loadingElement.classList.add('chat-message', 'ai', 'loading');
+    loadingElement.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+    chatContainer.appendChild(loadingElement);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return loadingElement;
+  }
+
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    startChatUI();
+    const topic = topicInput.value.trim();
+    if (!topic) return;
+
+    addMessage('user', topic);
+    topicInput.value = '';
+    const loadingIndicator = showLoadingIndicator();
+    submitBtn.disabled = true;
+
+    try {
+      const response = await fetch('/api/bernard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic }),
+      });
+      loadingIndicator.remove();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ein unbekannter Fehler ist aufgetreten.');
+      }
+      const data = await response.json();
+      addMessage('ai', data.response);
+    } catch (error) {
+      addMessage('ai', `Fehler: ${error.message}`);
+      loadingIndicator.remove();
+    }
+  });
+
+  // ----- HIER IST DIE ÄNDERUNG -----
+  // Startet die UI beim allerersten Klick irgendwo auf der Seite.
+  // { once: true } sorgt dafür, dass dies nur ein einziges Mal passiert.
+  window.addEventListener('click', startChatUI, { once: true });
+
+</script>
+
+</body>
+</html>
