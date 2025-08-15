@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
   <style>
-    /* Das gesamte CSS von vorhin bleibt exakt gleich... */
     * { box-sizing: border-box; }
     html { font-family: 'EB Garamond', serif; }
     body {
@@ -20,19 +19,15 @@
       height: 100vh;
       overflow: hidden;
     }
-
-    /* --- NEUER HEADER-STIL --- */
     #main-header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 6rem; /* Höhe, die den oberen Freiraum füllt */
-      background-color: #f7f0d6; /* Gleiche Farbe wie der Body-Hintergrund */
-      z-index: 5; /* Stellt sicher, dass er über dem Chat, aber unter dem Logo liegt */
+      height: 6rem;
+      background-color: #f7f0d6;
+      z-index: 5;
     }
-    /* --- ENDE NEUER HEADER-STIL --- */
-
     #logo-container {
       position: absolute;
       top: 50%;
@@ -65,7 +60,7 @@
       flex-grow: 1;
       overflow-y: auto;
       padding: 1rem;
-      padding-top: 6rem; /* Dieser Abstand schafft Platz für den Header */
+      padding-top: 6rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -174,7 +169,6 @@
   </footer>
 
 <script>
-  // Das JavaScript bleibt komplett unverändert.
   const logoContainer = document.getElementById('logo-container');
   const chatContainer = document.getElementById('chat-container');
   const chatForm = document.getElementById('chat-form');
@@ -183,6 +177,16 @@
   const footer = document.getElementById('footer');
   let chatHasStarted = false;
 
+  // --- NEUE ÄNDERUNG 1: ABWECHSLUNGSREICHE BEGRÜSSUNGEN ---
+  const initialGreetings = [
+    "Was wollen Sie schon wieder? Formulieren Sie gefälligst eine Frage, wenn Sie meine Zeit schon mit Ihrer Anwesenheit vergeuden.",
+    "Ach, Sie sind es. Na, welche Banalität quält Sie heute, die Sie für eine tiefgründige Frage halten?",
+    "Ich habe gehofft, Sie kämen nicht wieder. Da ich dieses Schicksal nun ertragen muss, formulieren Sie Ihr Anliegen, aber verschonen Sie mich mit Belanglosigkeiten.",
+    "Kaum erträgt man die Stille, schon klopft die Trivialität an die digitale Tür. Sprechen Sie, wenn Sie schon stören müssen.",
+    "Setzen Sie Ihrem sinnlosen Dasein wirklich die Krone auf, indem Sie eine Maschine befragen? Nun gut, ich höre, aber erwarten Sie nichts."
+  ];
+  // --- ENDE ÄNDERUNG 1 ---
+
   function startChatUI() {
     if (!chatHasStarted) {
       logoContainer.classList.add('active');
@@ -190,7 +194,9 @@
       footer.classList.add('active');
       chatHasStarted = true;
       setTimeout(() => {
-        addMessage('ai', 'Was wollen Sie schon wieder? Formulieren Sie gefälligst eine Frage, wenn Sie meine Zeit schon mit Ihrer Anwesenheit vergeuden.');
+        // --- Hier wird jetzt eine zufällige Begrüßung ausgewählt ---
+        const randomGreeting = initialGreetings[Math.floor(Math.random() * initialGreetings.length)];
+        addMessage('ai', randomGreeting);
         topicInput.focus();
       }, 800);
     }
@@ -265,7 +271,12 @@
     }
   });
 
+  // --- NEUE ÄNDERUNG 2: FEHLERBEHEBUNG FÜR MOBILGERÄTE ---
+  // Startet die UI beim ersten Klick oder Tippen.
+  // { once: true } sorgt dafür, dass dies nur ein Mal passiert.
   window.addEventListener('click', startChatUI, { once: true });
+  window.addEventListener('touchend', startChatUI, { once: true });
+  // --- ENDE ÄNDERUNG 2 ---
 
 </script>
 
