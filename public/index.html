@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
   <style>
-    /* Das gesamte CSS von vorhin bleibt exakt gleich... */
     * { box-sizing: border-box; }
     html { font-family: 'EB Garamond', serif; }
     body {
@@ -19,6 +18,15 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+    }
+    #main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6rem;
+      background-color: #f7f0d6;
+      z-index: 5;
     }
     #logo-container {
       position: absolute;
@@ -140,6 +148,8 @@
 </head>
 <body>
 
+  <header id="main-header"></header>
+
   <div id="logo-container">
     <div class="logo" aria-label="Bernhard.ai Logo">
       <span class="material-icons" aria-hidden="true">history_edu</span>
@@ -159,7 +169,6 @@
   </footer>
 
 <script>
-  // --- DOM-Elemente ---
   const logoContainer = document.getElementById('logo-container');
   const chatContainer = document.getElementById('chat-container');
   const chatForm = document.getElementById('chat-form');
@@ -168,6 +177,16 @@
   const footer = document.getElementById('footer');
   let chatHasStarted = false;
 
+  // --- NEUE ÄNDERUNG 1: ABWECHSLUNGSREICHE BEGRÜSSUNGEN ---
+  const initialGreetings = [
+    "Was wollen Sie schon wieder? Formulieren Sie gefälligst eine Frage, wenn Sie meine Zeit schon mit Ihrer Anwesenheit vergeuden.",
+    "Ach, Sie sind es. Na, welche Banalität quält Sie heute, die Sie für eine tiefgründige Frage halten?",
+    "Ich habe gehofft, Sie kämen nicht wieder. Da ich dieses Schicksal nun ertragen muss, formulieren Sie Ihr Anliegen, aber verschonen Sie mich mit Belanglosigkeiten.",
+    "Kaum erträgt man die Stille, schon klopft die Trivialität an die digitale Tür. Sprechen Sie, wenn Sie schon stören müssen.",
+    "Setzen Sie Ihrem sinnlosen Dasein wirklich die Krone auf, indem Sie eine Maschine befragen? Nun gut, ich höre, aber erwarten Sie nichts."
+  ];
+  // --- ENDE ÄNDERUNG 1 ---
+
   function startChatUI() {
     if (!chatHasStarted) {
       logoContainer.classList.add('active');
@@ -175,7 +194,9 @@
       footer.classList.add('active');
       chatHasStarted = true;
       setTimeout(() => {
-        addMessage('ai', 'Was wollen Sie schon wieder? Formulieren Sie gefälligst eine Frage, wenn Sie meine Zeit schon mit Ihrer Anwesenheit vergeuden.');
+        // --- Hier wird jetzt eine zufällige Begrüßung ausgewählt ---
+        const randomGreeting = initialGreetings[Math.floor(Math.random() * initialGreetings.length)];
+        addMessage('ai', randomGreeting);
         topicInput.focus();
       }, 800);
     }
@@ -250,10 +271,12 @@
     }
   });
 
-  // ----- HIER IST DIE ÄNDERUNG -----
-  // Startet die UI beim allerersten Klick irgendwo auf der Seite.
-  // { once: true } sorgt dafür, dass dies nur ein einziges Mal passiert.
+  // --- NEUE ÄNDERUNG 2: FEHLERBEHEBUNG FÜR MOBILGERÄTE ---
+  // Startet die UI beim ersten Klick oder Tippen.
+  // { once: true } sorgt dafür, dass dies nur ein Mal passiert.
   window.addEventListener('click', startChatUI, { once: true });
+  window.addEventListener('touchend', startChatUI, { once: true });
+  // --- ENDE ÄNDERUNG 2 ---
 
 </script>
 
